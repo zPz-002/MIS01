@@ -102,4 +102,15 @@ class music():
         self.soundscale.place(x=790,y=630,width=200,height=40)
         self.soundscale.set(20)
         label_sound=tk.Label(self.root,image=img_sound)
-        label_sound.place(x=740,y=630,width=40,height=40)
+        label_sound.place(x=740, y=630, width=40, height=40)
+    def sound(self,x):
+        sound_=int(x)/100
+        pygame.mixer.music.set_volume(sound_)
+
+
+    def changetime(self,x):
+        m=(x/1000)//60
+        s=str(int((x/1000)%60))
+        if len(s)==1:
+            s='0'+s
+        return('%d:%s'%(m,s))
