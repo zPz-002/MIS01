@@ -10,3 +10,6 @@ import pygame
 import tkinter as tk
 from PIL import Image,ImageTk
 from tkinter import ttk
+class music():
+    
+    def __init__(self,master):
