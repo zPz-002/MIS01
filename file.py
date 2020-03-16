@@ -113,4 +113,38 @@ class music():
         s=str(int((x/1000)%60))
         if len(s)==1:
             s='0'+s
-        return('%d:%s'%(m,s))
+        return ('%d:%s' % (m, s))
+    def show(self):
+        #通过歌单api链接得到返回值并解码
+        searchid=self.entryid.get()
+        url='http://music.163.com/api/playlist/detail?id=%s'%searchid
+        r = requests.get(url)
+        self.songlist = r.json()
+        #形成歌单列表
+        for i in range(len(self.songlist['result']['tracks'])):
+            song = self.songlist['result']['tracks'][i]['name']
+            id =self.songlist['result']['tracks'][i]['id']
+            duration = self.changetime(int(self.songlist['result']['tracks'][i]['duration']))
+            artist = self.songlist['result']['tracks'][i]['artists'][0]['name']
+            album = self.songlist['result']['tracks'][i]['album']['name']
+            self.tree.insert('',i, values = ('%s'%i, '%s'%song , '%s'%duration, '%s'%artist,'%s'%album))
+        #歌单封面图片
+        url_listpic=self.songlist['result']['coverImgUrl']
+        r_listpic = requests.get(url_listpic)
+        with open('%s.jpg' % searchid, 'wb') as p:#将图片下载到本地
+            p.write(r_listpic.content)
+        im_list = Image.open('%s.jpg' % searchid)
+        global img_list
+        img_list = ImageTk.PhotoImage(self.Resize(80.0, 80.0, im_list))
+        labelimg_list = tk.Label(self.root, image=img_list)
+        labelimg_list.place(x=10, y=10, width=80, height=80)
+        #歌单文字信息
+        list_name=self.songlist['result']['name']
+        list_description=self.songlist['result']['description']
+        list_playcount=self.songlist['result']['playCount']
+        label_name=tk.Label(self.root,text=list_name,font=(r'c:\windows\fonts\simsun.ttc',20),anchor='w')
+        label_name.place(x=100,y=10,width=500,height=30)
+        label_description=tk.Label(self.root,text=list_description,font=(r'c:\windows\fonts\simsun.ttc',8),anchor='w',justify='left')
+        label_description.place(x=100,y=45,width=600,height=25)
+        label_count=tk.Label(self.root,text='播放次数:'+str(list_playcount),font=(r'c:\windows\fonts\simsun.ttc',10),anchor='w')
+        label_count.place(x=100,y=75,width=200,height=15)
