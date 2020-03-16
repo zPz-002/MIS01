@@ -148,3 +148,73 @@ class music():
         label_description.place(x=100,y=45,width=600,height=25)
         label_count=tk.Label(self.root,text='播放次数:'+str(list_playcount),font=(r'c:\windows\fonts\simsun.ttc',10),anchor='w')
         label_count.place(x=100,y=75,width=200,height=15)
+    def Resize(self,w_box, h_box, pil_image):  # 参数是：要适应的窗口宽、高、Image.open后的图片
+        w, h = pil_image.size  # 获取图像的原始大小
+        f1 = 1.0 * w_box / w#获取高、宽的现有与标准的比例
+        f2 = 1.0 * h_box / h
+        factor = min([f1, f2])#取其中较小的作为需要缩放的比例
+        width = int(w * factor)
+        height = int(h * factor)
+        return pil_image.resize((width, height), Image.ANTIALIAS)
+
+    def download(self):#下载键
+        for item in self.tree.selection():#获取选中项目
+            item_text=self.tree.item(item,'value')
+        id = self.songlist['result']['tracks'][int(item_text[0])]['id']
+        url_song = 'http://music.163.com/song/media/outer/url?id=%s.mp3' % id
+        r_song = requests.get(url_song)
+        with open('%s.mp3' % id, 'wb') as s:#下载相应歌曲
+            s.write(r_song.content)
+
+        # 获取选中歌曲封面
+        pic = self.songlist['result']['tracks'][int(item_text[0])]['album']['picUrl']
+        url_pic = pic
+        r_pic = requests.get(url_pic)
+        with open('%s.jpg' % id, 'wb') as p:
+            p.write(r_pic.content)
+        im_song = Image.open('%s.jpg' % id)
+        global img_song
+        img_song = ImageTk.PhotoImage(self.Resize(80.0, 80.0, im_song))
+        labelimg_song = tk.Label(self.root, image=img_song)
+        labelimg_song.place(x=10, y=610, width=80, height=80)
+
+    def btnplay(self):
+        #获取选中项目
+        for item in self.tree.selection():
+            item_text=self.tree.item(item,'value')
+
+        if self.pause==True:#暂停状态
+            if self.flag==0:#是第一次播放，则需下载歌曲
+                #歌曲播放
+                id = self.songlist['result']['tracks'][int(item_text[0])]['id']
+                url_song='http://music.163.com/song/media/outer/url?id=%s.mp3'%id
+                r_song = requests.get(url_song)
+                with open('%s.mp3'%id,'wb') as s:#下载到本地
+                    s.write(r_song.content)
+                #播放歌曲
+                pygame.mixer.music.load('F:\北航\学习\大计基\大作业\%s.mp3'%id)
+                pygame.mixer.music.play()
+                self.button_play['image'] = img_pause#切换按钮显示的图片
+                self.pause = False
+                self.flag = 1
+                #歌曲封面
+                pic = self.songlist['result']['tracks'][int(item_text[0])]['album']['picUrl']
+                url_pic = pic
+                r_pic = requests.get(url_pic)
+                with open('%s.jpg'%id,'wb') as p:#将图片下载到本地
+                    p.write(r_pic.content)
+                im_song1 = Image.open('%s.jpg'%id)
+                global img_song1
+                img_song1=ImageTk.PhotoImage(self.Resize(80.0,80.0,im_song1))
+                labelimg_song1=tk.Label(self.root,image=img_song1)
+                labelimg_song1.place(x=10,y=610,width=80,height=80)
+
+
+            else:#如果不是第一次播放，则直接开始播放
+                pygame.mixer.music.unpause()
+                self.button_play['image']=img_pause#图片切换
+                self.pause=False
+        else:#若为播放状态
+            pygame.mixer.music.pause()
+            self.pause=True
+            self.button_play['image']=img_play
