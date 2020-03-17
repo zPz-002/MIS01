@@ -218,50 +218,6 @@ class music():
             pygame.mixer.music.pause()
             self.pause=True
             self.button_play['image'] = img_play
-    def btnnextplay(self):
-        for item in self.tree.selection():
-            item_text=self.tree.item(item,'value')
-        nextplay_id=self.songlist['result']['tracks'][int(item_text[0])+1]['id']
-        global img_nextsong
-        if self.pause==True:
-            self.button_play['image']=img_pause
-            self.pause = False
-            url = 'http://music.163.com/song/media/outer/url?id=%s.mp3' % nextplay_id
-            r = requests.get(url)
-            with open('%s.mp3' % nextplay_id, 'wb') as s:
-                s.write(r.content)
-            pygame.mixer.music.load('F:\北航\学习\大计基\大作业\%s.mp3' % nextplay_id)
-            pygame.mixer.music.play()
-
-            pic = self.songlist['result']['tracks'][int(item_text[0]) + 1]['album']['picUrl']
-            url_pic = pic
-            r_pic = requests.get(url_pic)
-            with open('%s.jpg' % nextplay_id, 'wb') as p:
-                p.write(r_pic.content)
-            im_nextsong = Image.open('%s.jpg' % nextplay_id)
-
-            img_nextsong = ImageTk.PhotoImage(self.Resize(80.0, 80.0, im_nextsong))
-            labelimg_song = tk.Label(self.root, image=img_nextsong)
-            labelimg_song.place(x=10, y=610, width=80, height=80)
-        else:
-            self.button_play['image'] = img_pause
-            url='http://music.163.com/song/media/outer/url?id=%s.mp3'%nextplay_id
-            r=requests.get(url)
-            with open('%s.mp3'%nextplay_id,'wb') as s:
-                s.write(r.content)
-            pygame.mixer.music.stop()
-            pygame.mixer.music.load('F:\北航\学习\大计基\大作业\%s.mp3'%nextplay_id)
-            pygame.mixer.music.play()
-
-            pic = self.songlist['result']['tracks'][int(item_text[0])+1]['album']['picUrl']
-            url_pic=pic
-            r_pic = requests.get(url_pic)
-            with open('%s.jpg' % nextplay_id, 'wb') as p:
-                p.write(r_pic.content)
-            im_nextsong = Image.open('%s.jpg' % nextplay_id)
-            img_nextsong = ImageTk.PhotoImage(self.Resize(80.0, 80.0, im_nextsong))
-            labelimg_song = tk.Label(self.root, image=img_nextsong)
-            labelimg_song.place(x=10, y=610, width=80, height=80)
 
     def btn_lastplay(self):
         for item in self.tree.selection():
